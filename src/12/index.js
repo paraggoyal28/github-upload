@@ -1,7 +1,6 @@
 import { createMachine, assign, interpret } from 'xstate';
 
 const elBox = document.querySelector('#box');
-
 const randomFetch = () => {
   return new Promise((res, rej) => {
     setTimeout(() => {
@@ -23,6 +22,9 @@ const machine = createMachine({
       },
     },
     pending: {
+      on: {
+        FETCH: 'idle',
+      },
       invoke: {
         src: (context, event) => {
           return randomFetch();
@@ -61,3 +63,4 @@ service.start();
 elBox.addEventListener('click', (event) => {
   service.send('FETCH');
 });
+
