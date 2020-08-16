@@ -3,6 +3,11 @@ import { createMachine, assign, interpret } from 'xstate';
 const elBox = document.querySelector('#box');
 const elBody = document.body;
 
+const incrementDragCount = assign({
+  drags: (context) => context.drags + 1,
+});
+
+
 const assignPoint = assign({
   px: (context, event) => event.clientX,
   py: (context, event) => event.clientY,
@@ -57,6 +62,10 @@ const machine = createMachine({
           // ...
           actions: assignPoint,
           target: 'dragging',
+          cond: (context) => {
+            console.log("Drags " + context.drags);
+            return context.drags < 5;
+          },
         },
       },
     },
@@ -64,6 +73,7 @@ const machine = createMachine({
       // Whenever we enter this state, we want to
       // increment the drags count.
       // ...
+      entry: incrementDragCount,
       on: {
         mousemove: {
           actions: assignDelta,
@@ -85,7 +95,7 @@ const service = interpret(machine);
 
 service.onTransition((state) => {
   if (state.changed) {
-    console.log(state.context);
+    // console.log(state.context);
 
     elBox.dataset.state = state.value;
     elBox.dataset.drags = state.context.drags;
